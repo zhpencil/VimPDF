@@ -73,8 +73,8 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.1
-          name: VimPDF 1.0.1
+          tag_name: v1.0.2
+          name: VimPDF 1.0.2
           body_path: RELEASE.md
           files: |
             dist/*.dmg

@@ -1,7 +1,7 @@
 {
   "name": "vimpdf",
   "productName": "VimPDF",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Vim-style PDF reader with highlights, notes, flashcards and math support",
   "main": "electron/main.cjs",
   "author": {
