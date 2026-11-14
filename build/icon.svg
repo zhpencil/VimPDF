@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE1BC"/>
+      <stop offset="1" stop-color="#F6C58C"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#F4F5F6"/>
+      <stop offset="1" stop-color="#E2E3E5"/>
+    </linearGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D6D8DA"/>
+      <stop offset="1" stop-color="#B9BCBF"/>
+    </linearGradient>
+    <linearGradient id="v" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46AE54"/>
+      <stop offset="1" stop-color="#2F7F38"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="26" stdDeviation="34" flood-color="#B06F2A" flood-opacity="0.33"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+
+  <g transform="translate(512 512) rotate(-8) translate(-512 -512)" filter="url(#shadow)">
+    <rect x="252" y="292" width="520" height="520" rx="132" fill="url(#base)"/>
+    <rect x="252" y="248" width="520" height="520" rx="132" fill="url(#cap)"/>
+    <path d="M386 414 L512 590 L638 414" fill="none" stroke="url(#v)" stroke-width="88"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

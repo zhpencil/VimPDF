@@ -1,0 +1,96 @@
+{
+  "name": "vimpdf",
+  "productName": "VimPDF",
+  "version": "1.0.0",
+  "description": "Vim-style PDF reader with highlights, notes, flashcards and math support",
+  "main": "electron/main.cjs",
+  "author": "zhpencil",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhpencil/VimPDF.git"
+  },
+  "homepage": "https://github.com/zhpencil/VimPDF",
+  "bugs": {
+    "url": "https://github.com/zhpencil/VimPDF/issues"
+  },
+  "scripts": {
+    "assets": "node scripts/copy-pdfjs-assets.cjs",
+    "predev": "npm run assets",
+    "dev": "concurrently -k -n vite,electron -c cyan,magenta \"vite\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "prebuild": "npm run assets",
+    "build": "tsc --noEmit && vite build",
+    "start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "shot": "electron scripts/capture-mockups.cjs"
+  },
+  "dependencies": {
+    "katex": "^0.19.1",
+    "pdfjs-dist": "^6.5.438",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sql.js": "^1.16.0",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/sql.js": "^1.4.11",
+    "@vitejs/plugin-react": "^5.2.0",
+    "concurrently": "^10.0.7",
+    "cross-env": "^10.1.0",
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.8",
+    "wait-on": "^9.5.1"
+  },
+  "build": {
+    "appId": "com.vimpdf.app",
+    "productName": "VimPDF",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/renderer/**/*",
+      "electron/**/*",
+      "package.json",
+      "!src/**/*",
+      "!design/**/*",
+      "!scripts/**/*",
+      "!release/**/*"
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"],
+      "icon": "build/icon.png"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Office",
+      "icon": "build/icon.png"
+    },
+    "fileAssociations": [
+      {
+        "ext": "pdf",
+        "name": "PDF Document",
+        "description": "PDF document",
+        "role": "Viewer",
+        "mimeType": "application/pdf"
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
