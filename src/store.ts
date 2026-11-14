@@ -16,6 +16,7 @@ import { buildToc } from './lib/toc'
 import { buildMarkdown } from './lib/markdown'
 import { fileStem } from './lib/library'
 import { isSpeaking, speak, stopSpeech } from './lib/speech'
+import { redoMathEditor, undoMathEditor } from './lib/mathEditorBridge'
 
 export type PageName = 'library' | 'reader' | 'deck'
 export type DialogName = 'shortcuts' | 'about' | 'set-default' | 'remove' | null
@@ -1180,6 +1181,12 @@ export const useAppStore = create<AppStore>((set, get) => {
 
     handleMenuCommand: (command) => {
       switch (command) {
+        case 'undo':
+          if (!undoMathEditor()) document.execCommand('undo')
+          break
+        case 'redo':
+          if (!redoMathEditor()) document.execCommand('redo')
+          break
         case 'open':
           void get().openPdfDialog()
           break

@@ -970,17 +970,17 @@ html[data-platform="linux"] .topbar {
   position: fixed;
   width: 260px;
   background: #fff;
-  border: 1px solid #d1d1d6;
+  border: 1px solid #d1d1d1;
   border-radius: 6px;
-  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
   padding: 10px;
   z-index: 60;
-  transition: opacity 0.15s ease;
+  animation: fade-in 0.15s ease both;
 }
 .note-pop .head {
   display: flex;
   align-items: center;
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--text-2);
   gap: 6px;
   margin-bottom: 6px;
@@ -993,7 +993,7 @@ html[data-platform="linux"] .topbar {
   height: 22px;
 }
 .note-pop .text {
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1058,7 +1058,7 @@ html[data-platform="linux"] .topbar {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.note-modal textarea {
+.note-input {
   margin: 10px 16px 0;
   height: 160px;
   border: 1px solid #d1d1d6;
@@ -1066,35 +1066,33 @@ html[data-platform="linux"] .topbar {
   padding: 8px 10px;
   font-size: 13.5px;
   line-height: 1.55;
-  resize: none;
+  background: #fff;
   outline: none;
-  background: #fff;
-}
-.note-modal textarea:focus {
-  border-color: var(--accent);
-}
-.preview-box {
-  margin: 8px 16px 0;
-  background: #fff;
-  border: 1px solid #d1d1d6;
-  border-radius: 6px;
-  padding: 8px 10px;
-  min-height: 54px;
-  max-height: 110px;
   overflow-y: auto;
-}
-.preview-label {
-  font-size: 9px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-bottom: 4px;
-}
-.preview-text {
-  font-size: 12.5px;
-  line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
+}
+.note-input:focus {
+  border-color: var(--accent);
+}
+.note-input[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: var(--text-3);
+  pointer-events: none;
+}
+.note-input .math-live {
+  display: inline-block;
+  vertical-align: baseline;
+  padding: 0 1px;
+  border-radius: 3px;
+  cursor: text;
+  white-space: normal;
+}
+.note-input .math-live:hover {
+  background: rgba(0, 122, 255, 0.08);
+}
+.note-input .katex {
+  font-size: 1.04em;
 }
 .note-modal .foot {
   display: flex;
@@ -1288,19 +1286,12 @@ html[data-platform="linux"] .topbar {
   white-space: pre-wrap;
   word-break: break-word;
 }
-.deck-note-editor textarea {
+.deck-note-editor .note-input {
   width: 100%;
-  min-height: 160px;
-  border: 1px solid #d1d1d6;
-  border-radius: 6px;
-  padding: 10px;
+  height: 170px;
+  margin: 0;
   font-size: 14px;
   line-height: 1.6;
-  resize: vertical;
-  outline: none;
-}
-.deck-note-editor textarea:focus {
-  border-color: var(--accent);
 }
 .deck-editor-actions {
   display: flex;

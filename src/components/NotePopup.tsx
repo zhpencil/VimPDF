@@ -25,21 +25,23 @@ export function NotePopup() {
       return
     }
     const rect = marker.getBoundingClientRect()
-    const stage = marker.closest('.stage')
-    if (stage) {
-      const bounds = stage.getBoundingClientRect()
-      if (rect.bottom < bounds.top || rect.top > bounds.bottom) {
-        closeNotePopup()
-        return
-      }
+    const stage = marker.closest<HTMLElement>('.stage')
+    const bounds = stage?.getBoundingClientRect()
+    if (bounds && (rect.bottom < bounds.top || rect.top > bounds.bottom)) {
+      closeNotePopup()
+      return
     }
     const width = popup.offsetWidth || 260
     const height = popup.offsetHeight || 160
-    const above = rect.top + rect.height / 2 > window.innerHeight * 0.55
-    const top = above ? rect.top - height - 10 : rect.bottom + 10
+    // Same rule as the macOS card: centred inside the reader surface with 8pt of slack per
+    // side, flipped above the marker past 55% of the surface height, its facing edge 10pt off.
+    const view = bounds ?? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+    const above = rect.top + rect.height / 2 - view.top > view.height * 0.55
+    const center = Math.min(Math.max(rect.left + rect.width / 2 - view.left, 138),
+                            Math.max(138, view.width - 138))
     setPosition({
-      left: Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8),
-      top: Math.min(Math.max(8, top), window.innerHeight - height - 8)
+      left: view.left + center - width / 2,
+      top: above ? rect.top - height - 10 : rect.bottom + 10
     })
   }, [popupId, closeNotePopup])
 
@@ -78,6 +80,7 @@ export function NotePopup() {
   return (
     <div
       className="note-pop"
+      key={popupId}
       ref={popupRef}
       style={{
         left: position?.left ?? -1000,

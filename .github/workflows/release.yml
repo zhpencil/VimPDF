@@ -1,0 +1,62 @@
+name: Build and publish release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: contains(github.event.head_commit.message, '[release]')
+    runs-on: macos-15
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          set -o pipefail
+          npm install --no-audit --no-fund 2>&1 | tee build.log
+          npm install --no-save --no-audit --no-fund sharp 2>&1 | tee -a build.log
+
+      - name: Generate app icon
+        run: |
+          set -o pipefail
+          node .github/scripts/icon.cjs 2>&1 | tee -a build.log
+
+      - name: Build macOS packages
+        run: |
+          set -o pipefail
+          npm run dist:mac 2>&1 | tee -a build.log
+          shasum -a 256 release/*.dmg release/*.zip > release/checksums.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: VimPDF 1.0.0
+          body_path: RELEASE.md
+          files: |
+            release/*.dmg
+            release/*.zip
+            release/checksums.txt
+          fail_on_unmatched_files: true
+          make_latest: true
+
+      - name: Commit failure log
+        if: failure()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tail -c 200000 build.log > ci-failure.log 2>/dev/null || echo "no build log" > ci-failure.log
+          git checkout -B ci-log
+          git add -f ci-failure.log
+          git commit -m "ci: build failure log" || true
+          git push -f origin HEAD:ci-log

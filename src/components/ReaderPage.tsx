@@ -80,14 +80,17 @@ export function ReaderPage() {
     const stageRect = stage.getBoundingClientRect()
     const shellRect = shell.getBoundingClientRect()
     const shellTop = shellRect.top - stageRect.top + stage.scrollTop
+    const visibleHeight = stage.clientHeight
     const paragraphHeight = paragraph.rect.height * scale
-    let target = shellTop + paragraph.rect.y * scale
-    if (paragraphHeight < stage.clientHeight - 80) {
-      target -= (stage.clientHeight - paragraphHeight) / 2
-    } else {
-      target -= 12
-    }
-    target = clamp(target, 0, Math.max(0, stage.scrollHeight - stage.clientHeight))
+    const paragraphTop = shellTop + paragraph.rect.y * scale
+    // A paragraph the screen can hold is centred; a taller one pins its opening line to the top
+    // edge so a switch never hides where the paragraph starts. The bounding box's top belongs to
+    // the last column read, so the opening line is what gets anchored.
+    const openingTop = shellTop + (paragraph.lineRects[0]?.y ?? paragraph.rect.y) * scale
+    let target = paragraphHeight + 24 <= visibleHeight
+      ? paragraphTop + paragraphHeight / 2 - visibleHeight / 2
+      : openingTop - 12
+    target = clamp(target, 0, Math.max(0, stage.scrollHeight - visibleHeight))
     const animate = previousScale.current !== 0 && previousScale.current !== scale
       ? false
       : scrollMode === 'smooth'

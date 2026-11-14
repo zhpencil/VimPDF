@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAppStore, tocSectionFor } from '../store'
 import type { Annotation } from '../types'
 import { useT } from '../lib/useT'
 import { AnnotationsSidebar } from './Sidebars'
 import { Icon } from './Icon'
+import { MathNoteEditor } from './MathNoteEditor'
 import { MathText } from './MathText'
 import { SearchBar } from './SearchBar'
 import { StatusBar } from './StatusBar'
@@ -100,43 +101,18 @@ function InlineEditor() {
   const setCardDraft = useAppStore((state) => state.setCardDraft)
   const saveCardEditing = useAppStore((state) => state.saveCardEditing)
   const cancelCardEditing = useAppStore((state) => state.cancelCardEditing)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [preview, setPreview] = useState(draft)
-
-  useEffect(() => {
-    textareaRef.current?.focus()
-  }, [])
-
-  useEffect(() => {
-    const timer = setTimeout(() => setPreview(draft), 150)
-    return () => clearTimeout(timer)
-  }, [draft])
 
   const blank = !draft.trim()
 
   return (
     <div className="deck-note-editor">
-      <textarea
-        ref={textareaRef}
+      <MathNoteEditor
         value={draft}
+        onChange={setCardDraft}
+        onSave={saveCardEditing}
+        onCancel={cancelCardEditing}
         placeholder={t('Use $…$ for inline math')}
-        onChange={(event) => setCardDraft(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            event.preventDefault()
-            cancelCardEditing()
-          } else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-            event.preventDefault()
-            if (!blank) saveCardEditing()
-          }
-        }}
       />
-      <div className="preview-box">
-        <div className="preview-label">{t('Live preview')}</div>
-        <div className="preview-text">
-          {blank ? t('Use $…$ for inline math') : <MathText text={preview} />}
-        </div>
-      </div>
       <div className="deck-editor-actions">
         <span className="hint-mono">{t('⌘↩ Update · Esc Cancel')}</span>
         <button className="btn ghost" onClick={cancelCardEditing}>{t('Cancel')}</button>

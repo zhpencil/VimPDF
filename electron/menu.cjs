@@ -118,8 +118,8 @@ function buildMenu({ language, send }) {
   template.push({
     label: L.edit,
     submenu: [
-      { role: 'undo', label: L.undo },
-      { role: 'redo', label: L.redo },
+      { label: L.undo, accelerator: 'CmdOrCtrl+Z', click: cmd('undo') },
+      { label: L.redo, accelerator: 'Shift+CmdOrCtrl+Z', click: cmd('redo') },
       { type: 'separator' },
       { role: 'cut', label: L.cut },
       { role: 'copy', label: L.copy },
