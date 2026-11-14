@@ -15,7 +15,7 @@ The first cross-platform release of VimPDF — a keyboard-first PDF reader for m
 ## Downloads
 
 - **macOS (Apple Silicon)** — `VimPDF-1.0.0-arm64.dmg`, or the portable `VimPDF-1.0.0-arm64-mac.zip`
-- **Windows (64-bit)** — `VimPDF Setup 1.0.0.exe`
+- **Windows (64-bit)** — `VimPDF.Setup.1.0.0.exe`
 - **Linux (64-bit)** — `VimPDF-1.0.0.AppImage`, or `vimpdf_1.0.0_amd64.deb`
 - `checksums.txt` — SHA-256 checksums for every file above
 
