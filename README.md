@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/hero.png" alt="VimPDF — a keyboard-first PDF reader for macOS, Windows and Linux" width="100%">
+</p>
+
 # VimPDF
 
 **A keyboard-first PDF reader with highlights, notes, flashcards and inline math.**
@@ -9,7 +13,7 @@ This is a cross-platform rebuild of the native macOS VimPDF app.
 
 ## Features
 
-- **Library** — four-column cover grid or a compact list, title search, sort orders, remembered reading position and zoom per document.
+- **Library** — adaptive portrait cover grid or a compact list, title search, sort orders, remembered reading position and zoom per document.
 - **Reader** — continuous pages, paragraph-level keyboard navigation, outline sidebar, occurrence-level search, annotations sidebar, clickable note markers, text-to-speech, immersive fullscreen.
 - **Highlights & notes** — highlight a paragraph with `H`, write a note with `N`, both rendered with inline KaTeX math, exportable as Markdown.
 - **Flashcards** — every highlight and note becomes a card in a review deck; edit inline, jump to the paragraph in one key, restore the last card you were on.
@@ -42,6 +46,16 @@ xattr -dr com.apple.quarantine /Applications/VimPDF.app
 | `P` | Read paragraph aloud | `?` | Show / hide shortcuts |
 
 In the library: arrows or `J K H L` select, `Return` opens, `O` opens a PDF, `F` searches, `V` switches grid/list, `N` opens the flashcard deck, `X` removes, `M` switches language.
+
+### Inline math in notes
+
+Wrap LaTeX in dollar signs to render it inline in notes, highlights, flashcards and exported Markdown:
+
+```text
+The energy is $E = mc^2$, so the ratio is $\frac{a}{b}$.
+```
+
+The formula renders as soon as the caret leaves it; move the caret back onto it to edit the source again.
 
 ## Development
 

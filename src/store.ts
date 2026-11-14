@@ -5,6 +5,7 @@ import type {
   Language,
   OpenDocument,
   PdfReadResult,
+  Rect,
   ShelfItem,
   ShelfViewMode,
   SortKey,
@@ -15,6 +16,7 @@ import { detectDocument, loadPdf, readMetadataTitle, renderCover, titleFromPath 
 import { buildToc } from './lib/toc'
 import { buildMarkdown } from './lib/markdown'
 import { fileStem } from './lib/library'
+import { findParagraphMatches } from './lib/search'
 import { isSpeaking, speak, stopSpeech } from './lib/speech'
 import { redoMathEditor, undoMathEditor } from './lib/mathEditorBridge'
 
@@ -26,10 +28,12 @@ export interface SearchState {
   query: string
   executed: string
   readerResults: number[]
+  readerRects: Rect[][]
   readerIndex: number
   deckResults: string[]
   deckIndex: number
   matchParagraph: number | null
+  matchRects: Rect[]
 }
 
 interface NoteEditorState {
@@ -171,10 +175,12 @@ function emptySearch(): SearchState {
     query: '',
     executed: '',
     readerResults: [],
+    readerRects: [],
     readerIndex: 0,
     deckResults: [],
     deckIndex: 0,
-    matchParagraph: null
+    matchParagraph: null,
+    matchRects: []
   }
 }
 
@@ -190,19 +196,6 @@ function sectionStarts(doc: OpenDocument): number[] {
   return [...new Set(
     doc.toc.filter((item) => item.paragraphIndex >= 0).map((item) => item.paragraphIndex)
   )].sort((a, b) => a - b)
-}
-
-function countOccurrences(haystack: string, needle: string): number {
-  if (!needle) return 0
-  const lower = haystack.toLowerCase()
-  let count = 0
-  let from = 0
-  for (;;) {
-    const at = lower.indexOf(needle, from)
-    if (at < 0) return count
-    count += 1
-    from = at + needle.length
-  }
 }
 
 function schedulePosition(documentId: number, paragraph: number, page: number): void {
@@ -400,8 +393,11 @@ export const useAppStore = create<AppStore>((set, get) => {
     if (!search.readerResults.length) return
     const length = search.readerResults.length
     const index = (search.readerIndex + delta + length) % length
-    patchSearch({ readerIndex: index, matchParagraph: search.readerResults[index] })
-    setFocus(search.readerResults[index])
+    patchSearch({
+      readerIndex: index,
+      matchParagraph: search.readerResults[index],
+      matchRects: search.readerRects[index] ?? []
+    })
   }
 
   const openReadResult = async (result: PdfReadResult, target: 'reader' | 'deck') => {
@@ -790,7 +786,12 @@ export const useAppStore = create<AppStore>((set, get) => {
       })
     },
 
-    closeSearch: () => patchSearch({ open: false, matchParagraph: null }),
+    closeSearch: () => {
+      const { page, search } = get()
+      const hit = page === 'reader' ? search.matchParagraph : null
+      patchSearch({ open: false, matchParagraph: null, matchRects: [] })
+      if (hit != null) setFocus(hit)
+    },
 
     setSearchQuery: (query) => patchSearch({ query }),
 
@@ -824,18 +825,27 @@ export const useAppStore = create<AppStore>((set, get) => {
       }
 
       if (search.executed !== query || !search.readerResults.length) {
-        const results: number[] = []
-        for (const paragraph of doc.paragraphs) {
-          const hits = countOccurrences(paragraph.text, lower)
-          for (let hit = 0; hit < hits; hit += 1) results.push(paragraph.index)
-        }
-        if (!results.length) {
-          patchSearch({ executed: query, readerResults: [], readerIndex: 0, matchParagraph: null })
+        const matches = doc.paragraphs.flatMap((paragraph) => findParagraphMatches(paragraph, lower))
+        if (!matches.length) {
+          patchSearch({
+            executed: query,
+            readerResults: [],
+            readerRects: [],
+            readerIndex: 0,
+            matchParagraph: null,
+            matchRects: []
+          })
           setStatus(t('No matches for “%@”', query))
           return
         }
-        patchSearch({ executed: query, readerResults: results, readerIndex: 0, matchParagraph: results[0] })
-        setFocus(results[0])
+        patchSearch({
+          executed: query,
+          readerResults: matches.map((match) => match.paragraphIndex),
+          readerRects: matches.map((match) => match.rects),
+          readerIndex: 0,
+          matchParagraph: matches[0].paragraphIndex,
+          matchRects: matches[0].rects
+        })
       } else {
         get().nextSearchResult()
       }

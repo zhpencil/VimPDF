@@ -113,6 +113,15 @@ export function useGlobalKeyboard(): void {
 
 type Store = ReturnType<typeof useAppStore.getState>
 
+// The shelf uses an adaptive grid, so J/K must step by however many columns the current
+// window width actually renders.
+function gridColumns(): number {
+  const grid = document.querySelector('.library-grid')
+  if (!grid) return 4
+  const template = getComputedStyle(grid).gridTemplateColumns
+  return Math.max(1, template.split(/\s+/).filter(Boolean).length)
+}
+
 function handleLibrary(event: KeyboardEvent, state: Store): void {
   const visible = visibleShelf(state.shelf, state.libraryQuery, state.sort)
   const forward = event.key === 'ArrowDown' || event.code === 'KeyJ'
@@ -124,7 +133,7 @@ function handleLibrary(event: KeyboardEvent, state: Store): void {
   if ((forward || backward || right || left) && visible.length) {
     let index = visible.findIndex((item) => item.id === state.selectedId)
     if (index < 0) index = 0
-    const step = grid ? 4 : 1
+    const step = grid ? gridColumns() : 1
     if (forward) index += step
     if (backward) index -= step
     if (right && grid) index += 1
@@ -148,7 +157,7 @@ function handleLibrary(event: KeyboardEvent, state: Store): void {
     return
   }
 
-  if (isHelpKey(event)) {
+  if (isHelpKey(event) || isSlashKey(event)) {
     state.setDialog('set-default')
     event.preventDefault()
     return

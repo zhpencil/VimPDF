@@ -180,9 +180,7 @@ html[data-platform="linux"] .topbar {
   stroke: none;
 }
 
-.app-shell[data-immersive="true"] .topbar,
-.app-shell[data-immersive="true"] .statusbar,
-.app-shell[data-immersive="true"] .side {
+.app-shell[data-immersive="true"] .topbar {
   display: none;
 }
 
@@ -199,19 +197,19 @@ html[data-platform="linux"] .topbar {
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+  gap: 22px 18px;
   align-content: start;
 }
 
 .book-card {
-  border: 1px solid #dbdbdb;
-  border-radius: var(--radius);
+  border: 1px solid #dbdbde;
+  border-radius: 8px;
   background: #fafafa;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
   position: relative;
   cursor: default;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -219,19 +217,24 @@ html[data-platform="linux"] .topbar {
 }
 .book-card:hover {
   background: #fff;
+  border-color: #cfcfd4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 .book-card.selected {
+  background: #fff;
   border: 2px solid var(--accent);
   padding: 9px;
-  background: #fff;
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.12);
 }
 
+/* Portrait page panel like the macOS shelf: the page sits on a light grey card with a
+   hairline frame, so the card reads as a book cover rather than a wide thumbnail. */
 .cover {
-  height: 176px;
+  width: 100%;
+  aspect-ratio: 5 / 7;
   border-radius: 4px;
+  border: 1px solid #d1d1d4;
   background: #ededed;
-  border: 1px solid #d1d1d6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +247,7 @@ html[data-platform="linux"] .topbar {
   display: block;
 }
 .cover-empty {
-  color: #b0b0b6;
+  color: var(--text-3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,8 +266,10 @@ html[data-platform="linux"] .topbar {
 .book-meta {
   font-size: 13px;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   min-width: 0;
+  padding: 0 1px;
 }
 .book-meta .name {
   display: -webkit-box;
@@ -272,22 +277,22 @@ html[data-platform="linux"] .topbar {
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
-  min-height: 35px;
 }
 .book-meta .progress {
   font-size: 11px;
-  color: var(--text-2);
+  color: var(--text-3);
   font-weight: 400;
-  margin-top: 3px;
+  margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
 }
 
 .card-menu {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 16px;
+  right: 16px;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -312,7 +317,7 @@ html[data-platform="linux"] .topbar {
 .library-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .book-row {
@@ -320,34 +325,37 @@ html[data-platform="linux"] .topbar {
   align-items: center;
   gap: 12px;
   padding: 7px 10px;
-  border: 1px solid #dbdbdb;
-  border-radius: var(--radius);
+  border: 1px solid #dbdbde;
+  border-radius: 8px;
   background: #fafafa;
   position: relative;
   min-height: 58px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .book-row:hover {
   background: #fff;
+  border-color: #cfcfd4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 .book-row.selected {
+  background: #fff;
   border: 2px solid var(--accent);
   padding: 6px 9px;
-  background: #fff;
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.12);
 }
 .book-row .thumb {
   width: 32px;
   height: 44px;
   border-radius: 3px;
+  border: 1px solid #d1d1d4;
   overflow: hidden;
   flex: 0 0 32px;
   background: #ededed;
-  border: 1px solid #d1d1d6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #b0b0b6;
+  color: var(--text-3);
 }
 .book-row .thumb img {
   width: 100%;
@@ -363,6 +371,7 @@ html[data-platform="linux"] .topbar {
   min-width: 0;
   font-size: 13px;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 .book-row .meta .name {
   white-space: nowrap;
@@ -371,9 +380,10 @@ html[data-platform="linux"] .topbar {
 }
 .book-row .meta .progress {
   font-size: 11px;
-  color: var(--text-2);
+  color: var(--text-3);
   font-weight: 400;
-  margin-top: 2px;
+  margin-top: 3px;
+  font-variant-numeric: tabular-nums;
 }
 .book-row .row-actions {
   display: flex;
@@ -1074,11 +1084,6 @@ html[data-platform="linux"] .topbar {
 }
 .note-input:focus {
   border-color: var(--accent);
-}
-.note-input[data-empty="true"]::before {
-  content: attr(data-placeholder);
-  color: var(--text-3);
-  pointer-events: none;
 }
 .note-input .math-live {
   display: inline-block;

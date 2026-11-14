@@ -29,7 +29,6 @@ export function NoteEditor() {
           onChange={setNoteDraft}
           onSave={saveNote}
           onCancel={cancelNote}
-          placeholder={t('Use $…$ for inline math')}
         />
         <div className="foot">
           <button className="btn ghost" onClick={cancelNote}>{t('Cancel')}</button>

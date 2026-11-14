@@ -901,6 +901,7 @@ function makeParagraph(lines: TextLine[], pageIndex: number, kind: ParagraphKind
     kind,
     rect: unionRect(lines.map((line) => line.rect)),
     lineRects: lines.map((line) => line.rect),
+    lineTexts: lines.map((line) => line.text),
     fontSize: medianValue(lines.map((line) => line.fontSize))
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useAppStore } from '../store'
 import { useT } from '../lib/useT'
+import { animateScrollTop } from '../lib/scroll'
 import { Icon } from './Icon'
 import { PdfPage } from './PdfPage'
 import { AnnotationsSidebar, TocSidebar } from './Sidebars'
@@ -10,26 +11,6 @@ import { NotePopup } from './NotePopup'
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
-}
-
-function animateScrollTop(element: HTMLElement, target: number, duration = 200): void {
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const from = element.scrollTop
-  const delta = target - from
-  if (reduced || Math.abs(delta) < 1) {
-    element.scrollTop = target
-    return
-  }
-  const start = performance.now()
-  const step = (now: number) => {
-    const progress = Math.min(1, (now - start) / duration)
-    const eased = progress < 0.5
-      ? 2 * progress * progress
-      : 1 - Math.pow(-2 * progress + 2, 2) / 2
-    element.scrollTop = from + delta * eased
-    if (progress < 1) requestAnimationFrame(step)
-  }
-  requestAnimationFrame(step)
 }
 
 export function ReaderPage() {
@@ -110,6 +91,41 @@ export function ReaderPage() {
   }, [doc?.documentId, doc?.focus, scrollSeq, scale, fitScale, pageWidth])
 
   useEffect(() => {
+    const stage = stageRef.current
+    if (!doc || !stage || fitScale <= 0) return
+    if (!search.open || search.matchParagraph == null || !search.matchRects.length) return
+    const paragraph = doc.paragraphs[search.matchParagraph]
+    if (!paragraph) return
+    const shell = stage.querySelector<HTMLElement>(`[data-page="${paragraph.pageIndex}"]`)
+    if (!shell) return
+    const stageRect = stage.getBoundingClientRect()
+    const shellRect = shell.getBoundingClientRect()
+    const shellTop = shellRect.top - stageRect.top + stage.scrollTop
+    const top = Math.min(...search.matchRects.map((rect) => rect.y))
+    const bottom = Math.max(...search.matchRects.map((rect) => rect.y + rect.height))
+    const matchTop = shellTop + top * scale
+    const matchHeight = (bottom - top) * scale
+    const visibleHeight = stage.clientHeight
+    const target = clamp(
+      matchHeight + 24 <= visibleHeight
+        ? matchTop + matchHeight / 2 - visibleHeight / 2
+        : matchTop - 12,
+      0,
+      Math.max(0, stage.scrollHeight - visibleHeight)
+    )
+    animateScrollTop(stage, target)
+
+    if (pageWidth > stage.clientWidth) {
+      const shellLeft = shellRect.left - stageRect.left + stage.scrollLeft
+      const left = shellLeft + Math.min(...search.matchRects.map((rect) => rect.x)) * scale
+      const right = shellLeft + Math.max(...search.matchRects.map((rect) => rect.x + rect.width)) * scale
+      if (left < stage.scrollLeft || right > stage.scrollLeft + stage.clientWidth) {
+        stage.scrollLeft = Math.max(0, left - 24)
+      }
+    }
+  }, [search.open, search.executed, search.readerIndex, search.matchParagraph, search.matchRects, doc?.documentId, scale, fitScale, pageWidth])
+
+  useEffect(() => {
     if (!doc || !doc.annotations.length) {
       if (notePopupId) closeNotePopup()
       return
@@ -157,6 +173,7 @@ export function ReaderPage() {
                   (annotation) => doc.paragraphs[annotation.paragraphIndex]?.pageIndex === index
                 )}
                 searchParagraph={search.matchParagraph}
+                searchRects={search.matchRects}
                 onMarker={(id) => {
                   if (notePopupId === id) closeNotePopup()
                   else openNotePopup(id)

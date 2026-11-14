@@ -60,6 +60,7 @@ export interface Paragraph {
   kind: ParagraphKind
   rect: Rect
   lineRects: Rect[]
+  lineTexts: string[]
   fontSize: number
 }
 

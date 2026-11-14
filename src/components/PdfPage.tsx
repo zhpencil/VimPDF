@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import type { RenderTask } from 'pdfjs-dist'
-import type { Annotation, OpenDocument, Paragraph } from '../types'
+import type { Annotation, OpenDocument, Paragraph, Rect } from '../types'
 
 interface PdfPageProps {
   doc: OpenDocument
@@ -11,6 +11,7 @@ interface PdfPageProps {
   focusIndex: number
   annotations: Annotation[]
   searchParagraph: number | null
+  searchRects: Rect[]
   onMarker: (id: string) => void
 }
 
@@ -25,6 +26,7 @@ export function PdfPage({
   focusIndex,
   annotations,
   searchParagraph,
+  searchRects,
   onMarker
 }: PdfPageProps) {
   const shellRef = useRef<HTMLDivElement>(null)
@@ -138,7 +140,7 @@ export function PdfPage({
             </Fragment>
           )
         })}
-        {searchedParagraph?.lineRects.map((rect, lineIndex) => (
+        {searchedParagraph && searchRects.map((rect, lineIndex) => (
           <div
             key={`search-${lineIndex}`}
             className="hl-rect search"

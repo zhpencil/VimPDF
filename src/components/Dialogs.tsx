@@ -90,7 +90,7 @@ function AboutDialog() {
         <div className="logo"><Icon name="books" /></div>
         <div className="name">VimPDF</div>
         <div className="tagline">{t('PDF Reader for Vim Enthusiast')}</div>
-        <div className="version">Version {info?.version ?? '1.0.0'}</div>
+        <div className="version">Version {info?.version ?? '1.0.1'}</div>
         <div className="credits">
           {t('Made by Qwen, Qoder.')}
           <br />

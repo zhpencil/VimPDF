@@ -111,7 +111,6 @@ function InlineEditor() {
         onChange={setCardDraft}
         onSave={saveCardEditing}
         onCancel={cancelCardEditing}
-        placeholder={t('Use $…$ for inline math')}
       />
       <div className="deck-editor-actions">
         <span className="hint-mono">{t('⌘↩ Update · Esc Cancel')}</span>

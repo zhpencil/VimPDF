@@ -24,7 +24,7 @@ export function SearchBar() {
   const index = deck ? search.deckIndex : search.readerIndex
   const count = total
     ? `${index + 1} / ${total}`
-    : search.executed
+    : search.executed && search.executed === search.query.trim()
       ? t('No results')
       : ''
 

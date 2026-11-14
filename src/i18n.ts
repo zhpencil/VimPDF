@@ -10,7 +10,6 @@ const zh: Record<string, string> = {
   Close: '关闭',
   'Edit Note': '编辑笔记',
   'New Note': '新建笔记',
-  'Use $…$ for inline math': '用 $…$ 输入行内公式',
   'Live preview': '实时预览',
   'Previous match': '上一个匹配',
   'Next match': '下一个匹配',

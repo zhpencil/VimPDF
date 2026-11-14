@@ -8,7 +8,6 @@ interface MathNoteEditorProps {
   onChange: (source: string) => void
   onSave: () => void
   onCancel: () => void
-  placeholder?: string
   className?: string
   autoFocus?: boolean
 }
@@ -393,7 +392,6 @@ export function MathNoteEditor({
   onChange,
   onSave,
   onCancel,
-  placeholder,
   className,
   autoFocus = true
 }: MathNoteEditorProps) {
@@ -788,8 +786,6 @@ export function MathNoteEditor({
       suppressContentEditableWarning
       role="textbox"
       aria-multiline="true"
-      aria-label={placeholder}
-      data-placeholder={placeholder ?? ''}
       data-empty="true"
       spellCheck={false}
       autoCorrect="off"

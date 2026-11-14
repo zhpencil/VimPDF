@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useAppStore, tocSectionFor } from '../store'
 import type { Annotation, OpenDocument } from '../types'
+import { animateScrollTop } from '../lib/scroll'
 import { useT } from '../lib/useT'
 import { Icon } from './Icon'
 import { MathText } from './MathText'
@@ -11,13 +12,27 @@ export function TocSidebar() {
   const setFocus = useAppStore((state) => state.setFocus)
   const toggleToc = useAppStore((state) => state.toggleToc)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const mounted = useRef(false)
 
   const current = tocSectionFor(doc)
 
   useEffect(() => {
     if (!current) return
-    const node = scrollRef.current?.querySelector<HTMLElement>(`[data-toc-id="${current.id}"]`)
-    node?.scrollIntoView({ block: 'nearest' })
+    const scroll = scrollRef.current
+    const node = scroll?.querySelector<HTMLElement>(`[data-toc-id="${current.id}"]`)
+    if (!scroll || !node) return
+    const scrollRect = scroll.getBoundingClientRect()
+    const rowRect = node.getBoundingClientRect()
+    const target = Math.max(0, Math.min(
+      scroll.scrollTop + rowRect.top - scrollRect.top - (scroll.clientHeight - rowRect.height) / 2,
+      Math.max(0, scroll.scrollHeight - scroll.clientHeight)
+    ))
+    if (mounted.current) {
+      animateScrollTop(scroll, target, 150)
+    } else {
+      scroll.scrollTop = target
+      mounted.current = true
+    }
   }, [current?.id])
 
   if (!doc) return null

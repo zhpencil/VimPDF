@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { useAppStore } from '../store'
 import type { ShelfItem } from '../types'
 import { displayTitle, progressLabel, visibleShelf } from '../lib/library'
+import { animateScrollTop } from '../lib/scroll'
 import { useT } from '../lib/useT'
 import { Icon } from './Icon'
 
@@ -30,6 +31,7 @@ export function LibraryPage() {
   const setDialog = useAppStore((state) => state.setDialog)
   const [menu, setMenu] = useState<ItemMenuState | null>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
+  const firstSelection = useRef(true)
 
   const visible = useMemo(() => visibleShelf(shelf, query, sort), [shelf, query, sort])
 
@@ -40,8 +42,22 @@ export function LibraryPage() {
 
   useEffect(() => {
     if (!selectedId) return
-    const node = bodyRef.current?.querySelector<HTMLElement>(`[data-shelf-id="${selectedId}"]`)
-    node?.scrollIntoView({ block: 'nearest' })
+    const body = bodyRef.current
+    const node = body?.querySelector<HTMLElement>(`[data-shelf-id="${selectedId}"]`)
+    if (!body || !node) return
+    const bodyRect = body.getBoundingClientRect()
+    const nodeRect = node.getBoundingClientRect()
+    const max = Math.max(0, body.scrollHeight - body.clientHeight)
+    const target = Math.max(0, Math.min(
+      body.scrollTop + nodeRect.top - bodyRect.top - (body.clientHeight - nodeRect.height) / 2,
+      max
+    ))
+    if (firstSelection.current) {
+      body.scrollTop = target
+      firstSelection.current = false
+    } else {
+      animateScrollTop(body, target, 150)
+    }
   }, [selectionSeq, selectedId])
 
   useEffect(() => {
