@@ -8,9 +8,22 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     if: contains(github.event.head_commit.message, '[release]')
-    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            script: dist:mac
+            artifact: mac
+          - os: windows-latest
+            script: dist:win
+            artifact: windows
+          - os: ubuntu-latest
+            script: dist:linux
+            artifact: linux
+    runs-on: ${{ matrix.os }}
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
@@ -21,21 +34,40 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: |
-          set -o pipefail
-          npm install --no-audit --no-fund 2>&1 | tee build.log
-          npm install --no-save --no-audit --no-fund sharp 2>&1 | tee -a build.log
+        run: npm install --no-audit --no-fund
 
-      - name: Generate app icon
-        run: |
-          set -o pipefail
-          node .github/scripts/icon.cjs 2>&1 | tee -a build.log
+      - name: Build ${{ matrix.artifact }} packages
+        run: npm run ${{ matrix.script }}
 
-      - name: Build macOS packages
+      - name: Upload ${{ matrix.artifact }} artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.exe
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error
+          overwrite: true
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect installers
         run: |
-          set -o pipefail
-          npm run dist:mac 2>&1 | tee -a build.log
-          shasum -a 256 release/*.dmg release/*.zip > release/checksums.txt
+          mkdir -p dist
+          find artifacts -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} dist/ \;
+          cd dist
+          find . -maxdepth 1 -type f ! -name checksums.txt -print0 | sort -z | xargs -0 sha256sum > checksums.txt
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -44,19 +76,11 @@ jobs:
           name: VimPDF 1.0.0
           body_path: RELEASE.md
           files: |
-            release/*.dmg
-            release/*.zip
-            release/checksums.txt
+            dist/*.dmg
+            dist/*.zip
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.deb
+            dist/checksums.txt
           fail_on_unmatched_files: true
           make_latest: true
-
-      - name: Commit failure log
-        if: failure()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          tail -c 200000 build.log > ci-failure.log 2>/dev/null || echo "no build log" > ci-failure.log
-          git checkout -B ci-log
-          git add -f ci-failure.log
-          git commit -m "ci: build failure log" || true
-          git push -f origin HEAD:ci-log

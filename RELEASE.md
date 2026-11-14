@@ -14,11 +14,14 @@ The first cross-platform release of VimPDF — a keyboard-first PDF reader for m
 
 ## Downloads
 
-- `VimPDF-1.0.0-arm64.dmg` — macOS on Apple Silicon
-- `VimPDF-1.0.0-arm64-mac.zip` — portable app bundle
-- `checksums.txt` — SHA-256 checksums
+- **macOS (Apple Silicon)** — `VimPDF-1.0.0-arm64.dmg`, or the portable `VimPDF-1.0.0-arm64-mac.zip`
+- **Windows (64-bit)** — `VimPDF Setup 1.0.0.exe`
+- **Linux (64-bit)** — `VimPDF-1.0.0.AppImage`, or `vimpdf_1.0.0_amd64.deb`
+- `checksums.txt` — SHA-256 checksums for every file above
 
-## Installing on macOS
+## Installing
+
+### macOS
 
 The build is unsigned, so Gatekeeper blocks the first launch. Right-click **VimPDF** and choose **Open**, or run:
 
@@ -26,4 +29,14 @@ The build is unsigned, so Gatekeeper blocks the first launch. Right-click **VimP
 xattr -dr com.apple.quarantine /Applications/VimPDF.app
 ```
 
-Windows and Linux packages can be built from source with `npm run dist:win` and `npm run dist:linux`.
+### Windows
+
+Run the installer. The build is unsigned, so SmartScreen may warn: choose **More info → Run anyway**.
+
+### Linux
+
+```sh
+chmod +x VimPDF-1.0.0.AppImage && ./VimPDF-1.0.0.AppImage
+# or
+sudo dpkg -i vimpdf_1.0.0_amd64.deb
+```
