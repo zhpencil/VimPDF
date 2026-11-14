@@ -4,7 +4,10 @@
   "version": "1.0.0",
   "description": "Vim-style PDF reader with highlights, notes, flashcards and math support",
   "main": "electron/main.cjs",
-  "author": "zhpencil",
+  "author": {
+    "name": "zhpencil",
+    "email": "39160142+zhpencil@users.noreply.github.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
