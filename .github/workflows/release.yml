@@ -67,7 +67,8 @@ jobs:
           mkdir -p dist
           find artifacts -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} dist/ \;
           cd dist
-          find . -maxdepth 1 -type f ! -name checksums.txt -print0 | sort -z | xargs -0 sha256sum > checksums.txt
+          find . -maxdepth 1 -type f ! -name checksums.txt -print0 | sort -z | xargs -0 sha256sum \
+            | sed 's#\./VimPDF Setup #./VimPDF.Setup #' > checksums.txt
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
